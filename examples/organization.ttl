@@ -1,0 +1,56 @@
+@prefix ex: <https://example.org/organization/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:organizationOntology a owl:Ontology ;
+    rdfs:label "Organization Ontology"@en ;
+    rdfs:comment "Illustrative demo model. Not a universal enterprise ontology."@en .
+
+ex:Person a owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:label "Personne"@fr .
+ex:Employee a owl:Class ;
+    rdfs:subClassOf ex:Person ;
+    rdfs:label "Employee"@en .
+ex:Department a owl:Class ;
+    rdfs:label "Department"@en .
+ex:Project a owl:Class ;
+    rdfs:label "Project"@en .
+ex:Skill a owl:Class ;
+    rdfs:label "Skill"@en .
+
+ex:belongsTo a owl:ObjectProperty ;
+    rdfs:domain ex:Employee ;
+    rdfs:range ex:Department ;
+    rdfs:label "belongs to"@en .
+ex:hasSkill a owl:ObjectProperty ;
+    rdfs:domain ex:Employee ;
+    rdfs:range ex:Skill .
+ex:requiresSkill a owl:ObjectProperty ;
+    rdfs:domain ex:Project ;
+    rdfs:range ex:Skill .
+ex:managedBy a owl:ObjectProperty ;
+    rdfs:domain ex:Project ;
+    rdfs:range ex:Employee .
+ex:employeeId a owl:DatatypeProperty ;
+    rdfs:domain ex:Employee ;
+    rdfs:range xsd:string .
+
+ex:alice a ex:Employee, owl:NamedIndividual ;
+    rdfs:label "Alice"@en ;
+    ex:belongsTo ex:engineering ;
+    ex:hasSkill ex:python ;
+    ex:employeeId "E001" .
+ex:bob a ex:Employee ;
+    rdfs:label "Bob"@en ;
+    ex:belongsTo ex:engineering ;
+    ex:employeeId "E002" .
+ex:engineering a ex:Department ;
+    rdfs:label "Engineering"@en .
+ex:python a ex:Skill ;
+    rdfs:label "Python"@en .
+ex:searchProject a ex:Project ;
+    ex:requiresSkill ex:python ;
+    ex:managedBy ex:alice .

@@ -1,0 +1,3 @@
+@prefix ex: <https://example.org/broken/> .
+ex:Person a ex:Person
+THIS IS NOT VALID TURTLE

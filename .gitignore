@@ -1,0 +1,29 @@
+# Python virtual environments
+.venv/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Build artifacts
+dist/
+build/
+
+# Testing and code quality
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Generated reports
+reports/
+
+# IDE configuration
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
