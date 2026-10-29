@@ -1,43 +1,35 @@
-# Architecture — SemanticAudit 0.2.0
+Release Notes — SemanticAudit v0.2.0
+Overview
+Version 0.2.0 replaces the initial proof of concept with a modular, testable Ontology Inspector. The release focuses on reliable RDF loading, explicit RDF/OWL inventory, and reproducible JSON reports.
+Improvements over v0.1
+Architecture
+- Separated RDF loading, ontology inspection, report models, command-line handling, and application errors into dedicated modules.
+- Introduced typed, immutable Python report models.
+- Added a versioned JSON report format (schema_version: "1.0").
+Ontology inspection
+- Added inventories of explicitly declared classes, properties, and named individuals.
+- Preserved multilingual labels, comments, direct superclass relationships, property domains, ranges, and direct superproperties.
+- Recognized multiple property declarations or characteristics on the same IRI and avoided duplicate entity counts.
+- Counted distinct blank nodes separately from named individuals.
+- Documented and tested direct, explicit class membership counts without implicit reasoning.
+File loading and CLI
+- Supported RDF/XML and JSON-LD in addition to Turtle.
+- Added --rdf-format for input files with unrecognized extensions.
+- Added an explicit inspect subcommand while preserving the original command syntax.
+- Added JSON export to a file with protection against overwriting the input document.
+- Improved error messages for missing files, malformed RDF, and other invalid input.
+- Added the python -m semantic_audit entry point.
+Testing and project maintenance
+- Added automated tests covering RDF loading, ontology inventory rules, blank nodes, serialization, and CLI behavior.
+- Added GitHub Actions continuous integration configuration.
+- Added project documentation and an MIT license.
+Usage
+uv sync
+uv run python -m pytest -v
+uv run python -m semantic_audit --version
+uv run python -m semantic_audit inspect examples/organization.ttl
+uv run python -m semantic_audit inspect examples/organization.ttl --output reports/organization.json
+Scope and known limitations
+This release does not yet implement SHACL constraint validation, OWL/RDFS reasoning, ontology consistency checking, or automatic owl:imports resolution. The inspector reports explicitly declared information according to its documented inventory rules.
 
-## Modules
-
-- `loader.py` — lecture d'un document RDF local et traduction des erreurs RDFLib.
-- `inspector.py` — logique métier **pure sur un `rdflib.Graph`** ; aucune écriture disque.
-- `models.py` — résultats immuables et schéma de rapport versionné.
-- `cli.py` — interface utilisateur, sérialisation et export JSON.
-- `errors.py` — exceptions métiers.
-
-```text
-RDF/OWL file
-   -> loader.load_graph()
-   -> inspector.inspect_graph()
-   -> models.OntologyReport
-   -> cli.main() -> stdout / JSON file
-```
-
-## Règles de modélisation importantes
-
-1. Une **classe déclarée** est un IRI avec `rdf:type owl:Class` ou `rdfs:Class`.
-2. Une **propriété déclarée** est un IRI avec l'un des types listés dans
-   `PROPERTY_KINDS` (`rdf:Property`, `owl:ObjectProperty`, etc.).
-3. Un **individu nommé** est un IRI avec `rdf:type` d'une classe déclarée ou
-   `rdf:type owl:NamedIndividual`, hors classes, propriétés et ressources
-   `owl:Ontology`. Il est compté une seule fois, même avec plusieurs types.
-4. Les classes d'un individu sont les `rdf:type` **explicitement présents**
-   et correspondant à des classes déclarées.
-5. `rdfs:subClassOf` est inspecté, **pas exécuté** : un `Employee` n'est pas
-   automatiquement ajouté à `Person`.
-6. Les nœuds anonymes ne sont pas des individus nommés. Leur nombre total
-   dans le graphe est fourni séparément.
-7. Les mentions `owl:imports` ne sont pas automatiquement résolues.
-
-## Extensions prévues
-
-- SHACL et rapport de validation `sh:ValidationReport`.
-- Compétency questions SPARQL avec résultats attendus.
-- Inférences RDFS / OWL RL : *enrichissement séparé* du graphe de données.
-- Interface Streamlit et export audit.
-
-Les règles ci-dessus sont volontairement conservatrices. L'inspecteur n'est
-ni un reasoner, ni une preuve de cohérence logique.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for implementation details and precise counting rules.
