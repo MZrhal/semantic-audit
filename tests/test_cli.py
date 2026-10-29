@@ -50,8 +50,7 @@ def test_cli_reports_invalid_rdf_without_traceback(tmp_path, capsys):
 def test_cli_file_with_unrecognized_extension_works_with_override(tmp_path, capsys):
     path = tmp_path / "model.unknown"
     path.write_text(
-        "@prefix : <https://example.org/> . "
-        ":A a <http://www.w3.org/2002/07/owl#Class> .",
+        "@prefix : <https://example.org/> . :A a <http://www.w3.org/2002/07/owl#Class> .",
         encoding="utf-8",
     )
     status = main(["inspect", str(path), "--rdf-format", "turtle"])

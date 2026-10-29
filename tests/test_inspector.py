@@ -38,7 +38,8 @@ def test_labels_preserve_language_and_sort_order():
     graph.add((EX.Person, RDFS.label, Literal("Person", lang="en")))
     labels = inspect_graph(graph).classes[0].labels
     assert [(item.value, item.language) for item in labels] == [
-        ("Person", "en"), ("Personne", "fr")
+        ("Person", "en"),
+        ("Personne", "fr"),
     ]
 
 
@@ -129,11 +130,7 @@ def test_report_is_json_serializable_and_versioned(example_path):
     payload = json.loads(json.dumps(report.to_dict(), ensure_ascii=False))
     assert payload["schema_version"] == "1.0"
     assert payload["statistics"]["declared_classes"] == 5
-    assert any(
-        label["language"] == "fr"
-        for item in payload["classes"]
-        for label in item["labels"]
-    )
+    assert any(label["language"] == "fr" for item in payload["classes"] for label in item["labels"])
 
 
 def test_report_order_is_stable():

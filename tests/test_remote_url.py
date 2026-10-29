@@ -82,18 +82,24 @@ def test_remote_url_uses_owl_extension():
 
 
 def test_remote_rejects_html_github_page():
-    with patch(
-        "semantic_audit.loader.urlopen",
-        return_value=FakeHTTPResponse(content_type="text/html"),
-    ), pytest.raises(OntologyLoadError, match="HTML"):
+    with (
+        patch(
+            "semantic_audit.loader.urlopen",
+            return_value=FakeHTTPResponse(content_type="text/html"),
+        ),
+        pytest.raises(OntologyLoadError, match="HTML"),
+    ):
         load_graph("https://github.com/org/repo/blob/main/model.ttl")
 
 
 def test_remote_reports_http_failure():
-    with patch(
-        "semantic_audit.loader.urlopen",
-        side_effect=HTTPError("https://example.org/missing.owl", 404, "Not Found", None, None),
-    ), pytest.raises(OntologyLoadError, match="404"):
+    with (
+        patch(
+            "semantic_audit.loader.urlopen",
+            side_effect=HTTPError("https://example.org/missing.owl", 404, "Not Found", None, None),
+        ),
+        pytest.raises(OntologyLoadError, match="404"),
+    ):
         load_graph("https://example.org/missing.owl")
 
 

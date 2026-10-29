@@ -17,8 +17,7 @@ def test_nonexistent_file(tmp_path):
 def test_unsupported_extension_requires_explicit_format(tmp_path):
     path = tmp_path / "my-ontology.data"
     path.write_text(
-        "@prefix ex: <https://example.org/> . "
-        "ex:Person a <http://www.w3.org/2002/07/owl#Class> .",
+        "@prefix ex: <https://example.org/> . ex:Person a <http://www.w3.org/2002/07/owl#Class> .",
         encoding="utf-8",
     )
     with pytest.raises(OntologyLoadError, match="rdf-format"):
