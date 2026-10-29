@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from rdflib import Graph, Namespace, OWL, RDF
+from rdflib import OWL, RDF, Graph, Namespace
 
 from semantic_audit.errors import OntologyLoadError, OntologyParseError
 from semantic_audit.loader import load_graph

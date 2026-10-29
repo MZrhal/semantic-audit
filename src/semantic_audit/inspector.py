@@ -7,7 +7,7 @@ All counts of individuals refer to distinct named URI nodes (not blank nodes).
 from collections import defaultdict
 from pathlib import Path
 
-from rdflib import BNode, Graph, Literal, OWL, RDF, RDFS, URIRef
+from rdflib import OWL, RDF, RDFS, BNode, Graph, Literal, URIRef
 
 from semantic_audit.loader import load_graph
 from semantic_audit.models import (

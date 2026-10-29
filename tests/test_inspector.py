@@ -2,7 +2,7 @@
 
 import json
 
-from rdflib import BNode, Graph, Literal, Namespace, OWL, RDF, RDFS
+from rdflib import OWL, RDF, RDFS, BNode, Graph, Literal, Namespace
 
 from semantic_audit.inspector import inspect_graph, inspect_ontology
 
