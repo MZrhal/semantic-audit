@@ -1,11 +1,14 @@
 """Load local or HTTP(S) RDF documents without resolving ``owl:imports``."""
 
+from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from threading import RLock
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
+import rdflib
 from rdflib import Graph
 from rdflib.util import guess_format
 
@@ -31,6 +34,20 @@ CONTENT_TYPES = {
     "application/trig": "trig",
     "text/n3": "n3",
 }
+
+_NORMALIZATION_LOCK = RLock()
+
+
+@contextmanager
+def _preserve_lexical_forms():
+    """Preserve RDF literal lexical forms while parsing."""
+    with _NORMALIZATION_LOCK:
+        previous = rdflib.NORMALIZE_LITERALS
+        rdflib.NORMALIZE_LITERALS = False
+        try:
+            yield
+        finally:
+            rdflib.NORMALIZE_LITERALS = previous
 
 
 def is_remote_url(source: str | Path) -> bool:
@@ -84,7 +101,8 @@ def _read_remote(url: str, rdf_format: str | None) -> Graph:
                 graph = Graph()
                 try:
                     # publicID preserves relative-IRI resolution against the remote URL.
-                    graph.parse(file=download, format=syntax, publicID=final_url)
+                    with _preserve_lexical_forms():
+                        graph.parse(file=download, format=syntax, publicID=final_url)
                 except Exception as exc:
                     raise OntologyParseError(
                         f"Impossible d'analyser '{url}' avec le format '{syntax}' : {exc}"
@@ -123,7 +141,8 @@ def load_graph(path: str | Path, rdf_format: str | None = None) -> Graph:
 
     graph = Graph()
     try:
-        graph.parse(source=source.resolve().as_uri(), format=syntax)
+        with _preserve_lexical_forms():
+            graph.parse(source=source.resolve().as_uri(), format=syntax)
     except Exception as exc:
         raise OntologyParseError(
             f"Impossible de lire '{source}' avec le format '{syntax}' : {exc}"

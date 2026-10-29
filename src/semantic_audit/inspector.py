@@ -9,6 +9,7 @@ from pathlib import Path
 
 from rdflib import OWL, RDF, RDFS, BNode, Graph, Literal, URIRef
 
+from semantic_audit.diagnostics import inspect_literals
 from semantic_audit.loader import is_remote_url, load_graph
 from semantic_audit.models import (
     ClassInfo,
@@ -143,6 +144,7 @@ def inspect_graph(graph: Graph, source: str = "<in-memory>") -> OntologyReport:
         classes=classes,
         properties=properties,
         individuals=individuals,
+        issues=inspect_literals(graph),
     )
 
 

@@ -48,13 +48,25 @@ class Statistics:
 
 
 @dataclass(frozen=True, slots=True)
+class Diagnostic:
+    code: str
+    severity: str
+    subject: str
+    predicate: str
+    datatype: str
+    lexical_value: str
+    message: str
+
+
+@dataclass(frozen=True, slots=True)
 class OntologyReport:
     source: str
     statistics: Statistics
     classes: tuple[ClassInfo, ...]
     properties: tuple[PropertyInfo, ...]
     individuals: tuple[IndividualInfo, ...]
+    issues: tuple[Diagnostic, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the report to a deterministic JSON-friendly object."""
-        return {"schema_version": "1.0", **asdict(self)}
+        return {"schema_version": "1.1", **asdict(self)}

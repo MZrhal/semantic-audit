@@ -128,7 +128,7 @@ def test_no_triples_produces_zero_statistics():
 def test_report_is_json_serializable_and_versioned(example_path):
     report = inspect_ontology(example_path)
     payload = json.loads(json.dumps(report.to_dict(), ensure_ascii=False))
-    assert payload["schema_version"] == "1.0"
+    assert payload["schema_version"] == "1.1"
     assert payload["statistics"]["declared_classes"] == 5
     assert any(label["language"] == "fr" for item in payload["classes"] for label in item["labels"])
 
