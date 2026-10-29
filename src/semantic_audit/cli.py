@@ -9,6 +9,7 @@ from pathlib import Path
 from semantic_audit import __version__
 from semantic_audit.errors import OntologyError
 from semantic_audit.inspector import inspect_ontology
+from semantic_audit.loader import is_remote_url
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -17,11 +18,11 @@ def create_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--version", action="version", version=f"SemanticAudit {__version__}")
     subcommands = parser.add_subparsers(dest="command", required=True)
-    inspect = subcommands.add_parser("inspect", help="Inspecter un document RDF local")
-    inspect.add_argument("path", type=Path, help="Chemin vers le document RDF/OWL")
-    inspect.add_argument(
-        "--rdf-format", help="Format d'entrée RDFLib (ex. turtle, xml, json-ld)"
+    inspect = subcommands.add_parser(
+        "inspect", help="Inspecter un fichier RDF local ou une URL HTTP(S)"
     )
+    inspect.add_argument("path", help="Chemin ou URL HTTP(S) d’un document RDF/OWL")
+    inspect.add_argument("--rdf-format", help="Format d'entrée RDFLib (ex. turtle, xml, json-ld)")
     inspect.add_argument(
         "--output", type=Path, help="Écrire le JSON dans ce fichier au lieu de stdout"
     )
@@ -44,7 +45,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         report = inspect_ontology(args.path, rdf_format=args.rdf_format)
         serialized = json.dumps(report.to_dict(), ensure_ascii=False, indent=2) + "\n"
         if args.output is not None:
-            if args.output.resolve() == args.path.resolve():
+            if (
+                not is_remote_url(args.path)
+                and args.output.resolve() == Path(args.path).expanduser().resolve()
+            ):
                 print(
                     "Erreur : le rapport ne doit pas écraser le fichier RDF source.",
                     file=sys.stderr,

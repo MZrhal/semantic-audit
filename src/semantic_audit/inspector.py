@@ -9,7 +9,7 @@ from pathlib import Path
 
 from rdflib import OWL, RDF, RDFS, BNode, Graph, Literal, URIRef
 
-from semantic_audit.loader import load_graph
+from semantic_audit.loader import is_remote_url, load_graph
 from semantic_audit.models import (
     ClassInfo,
     IndividualInfo,
@@ -86,9 +86,8 @@ def inspect_graph(graph: Graph, source: str = "<in-memory>") -> OntologyReport:
             direct_class_members[rdf_type].add(individual)
             individual_class_types[individual].add(rdf_type)
 
-    named_individuals = (
-        set(individual_class_types)
-        | (_named_subjects(graph, {OWL.NamedIndividual}) - schema_nodes)
+    named_individuals = set(individual_class_types) | (
+        _named_subjects(graph, {OWL.NamedIndividual}) - schema_nodes
     )
 
     classes = tuple(
@@ -130,12 +129,7 @@ def inspect_graph(graph: Graph, source: str = "<in-memory>") -> OntologyReport:
         for node in sorted(named_individuals, key=str)
     )
 
-    blank_nodes = {
-        node
-        for triple in graph
-        for node in triple
-        if isinstance(node, BNode)
-    }
+    blank_nodes = {node for triple in graph for node in triple if isinstance(node, BNode)}
 
     return OntologyReport(
         source=source,
@@ -155,4 +149,5 @@ def inspect_graph(graph: Graph, source: str = "<in-memory>") -> OntologyReport:
 def inspect_ontology(path: str | Path, rdf_format: str | None = None) -> OntologyReport:
     """Load and inspect a local RDF file; return a structured report."""
     graph = load_graph(path, rdf_format=rdf_format)
-    return inspect_graph(graph, source=str(Path(path).expanduser()))
+    source = str(path) if is_remote_url(path) else str(Path(path).expanduser())
+    return inspect_graph(graph, source=source)
