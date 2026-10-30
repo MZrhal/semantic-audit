@@ -2,7 +2,7 @@
 # SemanticAudit — Software Architecture
 
 **Development branch:** `feature/v0.3.0`  
-**Package version:** `0.2.0` (pending v0.3.0 release)  
+**Package version:** `0.3.0` 
 **JSON report schema:** `1.2`  
 **Language:** Python 3.13  
 **Primary RDF library:** RDFLib

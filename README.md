@@ -8,7 +8,7 @@
 An open-source Python CLI for RDF/OWL ontology inspection, structured diagnostics, and namespace analysis.
 
 **Development status:** v0.3.0 in progress  
-**Current package version:** 0.2.0  
+**Current package version:** 0.3.0  
 **JSON report schema:** 1.2  
 **License:** MIT
 
