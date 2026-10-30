@@ -16,7 +16,7 @@ def test_cli_prints_valid_json(example_path, capsys):
 
 def test_legacy_cli_syntax_is_supported(example_path, capsys):
     assert main([str(example_path)]) == 0
-    assert json.loads(capsys.readouterr().out)["schema_version"] == "1.1"
+    assert json.loads(capsys.readouterr().out)["schema_version"] == "1.2"
 
 
 def test_cli_writes_output_to_file(example_path, tmp_path, capsys):

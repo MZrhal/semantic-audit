@@ -59,6 +59,20 @@ class Diagnostic:
 
 
 @dataclass(frozen=True, slots=True)
+class NamespaceInfo:
+    namespace: str
+    classification: str
+    iri_count: int
+    internal_iri_count: int | None
+    declared_classes: int
+    internal_declared_classes: int | None
+    declared_properties: int
+    internal_declared_properties: int | None
+    named_individuals: int
+    internal_named_individuals: int | None
+
+
+@dataclass(frozen=True, slots=True)
 class OntologyReport:
     source: str
     statistics: Statistics
@@ -66,7 +80,9 @@ class OntologyReport:
     properties: tuple[PropertyInfo, ...]
     individuals: tuple[IndividualInfo, ...]
     issues: tuple[Diagnostic, ...] = ()
+    internal_prefixes: tuple[str, ...] = ()
+    namespaces: tuple[NamespaceInfo, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the report to a deterministic JSON-friendly object."""
-        return {"schema_version": "1.1", **asdict(self)}
+        return {"schema_version": "1.2", **asdict(self)}

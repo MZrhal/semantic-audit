@@ -19,6 +19,7 @@ from semantic_audit.models import (
     PropertyInfo,
     Statistics,
 )
+from semantic_audit.namespaces import analyze_namespaces
 
 # Including characteristic declarations means e.g. an owl:TransitiveProperty
 # is recognized as a property even if no owl:ObjectProperty triple is present.
@@ -64,7 +65,9 @@ def _texts(graph: Graph, subject: URIRef, predicate: URIRef) -> tuple[LocalizedT
     return tuple(sorted(entries, key=lambda e: (e.language or "", e.value, e.datatype or "")))
 
 
-def inspect_graph(graph: Graph, source: str = "<in-memory>") -> OntologyReport:
+def inspect_graph(
+    graph: Graph, source: str = "<in-memory>", internal_prefixes: tuple[str, ...] = ()
+) -> OntologyReport:
     """Inspect an already parsed RDFLib graph.
 
     A named individual is a URI resource explicitly typed as an enumerated
@@ -145,11 +148,29 @@ def inspect_graph(graph: Graph, source: str = "<in-memory>") -> OntologyReport:
         properties=properties,
         individuals=individuals,
         issues=inspect_literals(graph),
+        internal_prefixes=internal_prefixes,
+        namespaces=analyze_namespaces(
+            graph,
+            declared_classes=declared_classes,
+            declared_properties=declared_properties,
+            named_individuals=named_individuals,
+            internal_prefixes=internal_prefixes,
+        ),
     )
 
 
-def inspect_ontology(path: str | Path, rdf_format: str | None = None) -> OntologyReport:
-    """Load and inspect a local RDF file; return a structured report."""
+def inspect_ontology(
+    path: str | Path,
+    rdf_format: str | None = None,
+    internal_prefixes: tuple[str, ...] = (),
+) -> OntologyReport:
+    """Load and inspect a local or remote RDF ontology."""
     graph = load_graph(path, rdf_format=rdf_format)
+
     source = str(path) if is_remote_url(path) else str(Path(path).expanduser())
-    return inspect_graph(graph, source=source)
+
+    return inspect_graph(
+        graph,
+        source=source,
+        internal_prefixes=internal_prefixes,
+    )

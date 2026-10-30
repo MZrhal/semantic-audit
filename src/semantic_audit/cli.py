@@ -5,11 +5,20 @@ import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from semantic_audit import __version__
 from semantic_audit.errors import OntologyError
 from semantic_audit.inspector import inspect_ontology
 from semantic_audit.loader import is_remote_url
+
+
+def _internal_prefix(value: str) -> str:
+    """Accept non-empty absolute IRI prefixes."""
+    if not value or any(character.isspace() for character in value) or not urlsplit(value).scheme:
+        raise argparse.ArgumentTypeError("Le préfixe interne doit être une IRI absolue non vide.")
+
+    return value
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -23,6 +32,14 @@ def create_parser() -> argparse.ArgumentParser:
     )
     inspect.add_argument("path", help="Chemin ou URL HTTP(S) d’un document RDF/OWL")
     inspect.add_argument("--rdf-format", help="Format d'entrée RDFLib (ex. turtle, xml, json-ld)")
+    inspect.add_argument(
+        "--internal-prefix",
+        action="append",
+        default=[],
+        type=_internal_prefix,
+        metavar="IRI",
+        help=("Préfixe d'IRI considéré interne. Option répétable pour plusieurs préfixes."),
+    )
     inspect.add_argument(
         "--output", type=Path, help="Écrire le JSON dans ce fichier au lieu de stdout"
     )
@@ -42,7 +59,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     args = create_parser().parse_args(arguments)
     try:
-        report = inspect_ontology(args.path, rdf_format=args.rdf_format)
+        report = inspect_ontology(
+            args.path,
+            rdf_format=args.rdf_format,
+            internal_prefixes=tuple(args.internal_prefix),
+        )
         serialized = json.dumps(report.to_dict(), ensure_ascii=False, indent=2) + "\n"
         if args.output is not None:
             if (

@@ -120,7 +120,7 @@ def test_cli_serializes_diagnostics(tmp_path):
 
     payload = json.loads(output.read_text(encoding="utf-8"))
 
-    assert payload["schema_version"] == "1.1"
+    assert payload["schema_version"] == "1.2"
     assert len(payload["issues"]) == 1
     assert payload["issues"][0]["code"] == "INVALID_TYPED_LITERAL"
     assert payload["issues"][0]["lexical_value"] == "2026-04-10 9:06:01"
